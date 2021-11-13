@@ -9,7 +9,9 @@ public class Flight implements Comparable<Flight> {
 
     private Airport destination; //changed from String to Airport
     private LocalDateTime departureTime; //changed from String to LocalDate
+
     private float price; //added price
+
     private String flightNumber; //added flight number for some uniqueness.
 
     private Gate gate;

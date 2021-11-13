@@ -1,18 +1,19 @@
 package with.william.airport.other;
 
 import with.william.airport.Flight;
+import with.william.airport.util.Util;
 
-public class Boardingpass {
+public class BoardingPass {
    private Flight flight;
 
    private String seat;
-   private String clazz;
+   private FlightClass flightClass;  //changed from String to enum
 
 
-   public Boardingpass(Flight flight, String seat, String clazz) {
+   public BoardingPass(Flight flight, String seat, FlightClass flightClass) {
        this.flight = flight;
        this.seat = seat;
-       this.clazz = clazz;
+       this.flightClass = flightClass;
    }
 
     public Flight getFlight() {
@@ -21,6 +22,6 @@ public class Boardingpass {
 
     @Override
     public String toString() {
-        return String.format("%s Flight number: %s, Seat: %s, Class: %s" + flight.getFlightNumber(), seat, clazz);
+        return String.format("Flight: %s, Destination: %s, Departure: %s, Seat: %s, Class: %s", flight.getFlightNumber(), flight.getDestination().toString(), flight.getDepartureTime().format(Util.formatter), seat, flightClass.toString());
     }
 }

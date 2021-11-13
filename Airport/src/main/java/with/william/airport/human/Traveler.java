@@ -1,6 +1,6 @@
 package with.william.airport.human;
 
-import with.william.airport.other.Boardingpass;
+import with.william.airport.other.BoardingPass;
 import with.william.airport.other.Luggage;
 import with.william.airport.other.Passport;
 
@@ -11,7 +11,7 @@ public class Traveler extends Human {
 
     private Passport passport;
     private List<Luggage> luggage = new ArrayList<>();
-    private List<Boardingpass> boardingpass = new ArrayList<>();
+    private List<BoardingPass> boardingpass = new ArrayList<>();
 
     public Traveler(Passport passport) {
         super(passport);
@@ -27,7 +27,7 @@ public class Traveler extends Human {
         return luggage;
     }
 
-    public List<Boardingpass> getBoardingpass() {
+    public List<BoardingPass> getBoardingpass() {
         return boardingpass;
     }
 }

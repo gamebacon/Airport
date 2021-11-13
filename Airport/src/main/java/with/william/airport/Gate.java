@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Gate {
-    String name; //added name for identification.
+    private String name; //added name for identification.
 
     private List<Flight> flights = new ArrayList<Flight>();
 
@@ -18,6 +18,10 @@ public class Gate {
 
     @Override
     public String toString() {
+        return name;
+    }
+
+    public String getName() {
         return name;
     }
 }

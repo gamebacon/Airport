@@ -7,13 +7,13 @@ import java.util.Map;
 
 public class PassengerPlane extends Airplane {
 
-    public Map<String, Traveler> passengers = new HashMap<>(); // added seat and passengers map.
+    public Map<String, Traveler> passengersList = new HashMap<>(); // added seat and passengers map.
 
     public PassengerPlane() {
 
-        for(int i = 1; i <= 10; i++) {
+        for(int i = 1; i <= 9; i++) {
             for(char c : "ABCD".toCharArray()) {
-                passengers.put(i + "" +  c, null);
+                passengersList.put(i + "" +  c, null);
             }
         }
 

@@ -15,7 +15,7 @@ public class Terminal {
         this.name = name;
 
         for(int j = 1; j <= 3; j++) {
-            gates.add(new Gate(Integer.toString(j)));
+            gates.add(new Gate("Gate " + j));
         }
 
     }

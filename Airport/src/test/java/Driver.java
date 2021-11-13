@@ -4,7 +4,8 @@ import with.william.airport.Gate;
 import with.william.airport.Terminal;
 import with.william.airport.airplane.PassengerPlane;
 import with.william.airport.human.Traveler;
-import with.william.airport.other.Boardingpass;
+import with.william.airport.other.BoardingPass;
+import with.william.airport.other.FlightClass;
 import with.william.airport.util.Country;
 import with.william.airport.other.Passport;
 
@@ -20,6 +21,7 @@ public class Driver {
         NONE,
         EXIT,
         VIEW_MONITORS,
+        VIEW_BOARDINPASS,
         GO_TO_TERMINAL,
         GO_TO_GATE,
         BUY_TICKET
@@ -77,7 +79,8 @@ public class Driver {
         AirportAction action = AirportAction.NONE;
 
         while(action != AirportAction.EXIT) {
-            System.out.println(String.format("Current location: %s - %s \nBalance: $%.2f", currentTerminal.getName(), currentAirport.toString(), traveler.getBalance()));
+            System.out.println(
+                    String.format("\nCurrent location: %s%s - %s \nBalance: $%.2f\n", currentTerminal.getName(), currentGate != null ? String.format(", %s", currentGate.getName()) : "", currentAirport.toString(), traveler.getBalance()));
 
             //display all available actions.
             for(int i = 1; i < AirportAction.values().length; i++)
@@ -88,6 +91,9 @@ public class Driver {
                 action = AirportAction.values()[Integer.parseInt(scanner.nextLine())];
                 clear();
             } catch (Exception e) {}
+
+            System.out.println(action.toString());
+            System.out.println("###################################################");
 
             switch (action) {
 
@@ -106,6 +112,7 @@ public class Driver {
                         try {
                             currentTerminal = currentAirport.getTerminals().get(GetIntput() - 1);
                             System.out.println("Transferring to " + currentTerminal.getName() + "..");
+                            currentGate = null;
                             break;
                         } catch (Exception e) {}
 
@@ -133,6 +140,15 @@ public class Driver {
                     currentAirport.ViewMonitors();
                 }
 
+                case VIEW_BOARDINPASS -> {
+                    if(traveler.getBoardingpass().size() == 0)
+                        System.out.println("No tickets purchased.");
+
+                    for(BoardingPass boardingpass : traveler.getBoardingpass())
+                        System.out.println(boardingpass.toString());
+                }
+
+
                 case BUY_TICKET -> {
                     List<Flight> allFlights = new ArrayList<Flight>();
 
@@ -146,67 +162,68 @@ public class Driver {
 
 
                     while(true) {
-                        System.out.println("   Price | No. | Time | Gate  | Destination ");
-                        System.out.println("-----------------------------------");
+                        System.out.println("   Price | No.  | Time  | Gate      | Destination ");
+                        System.out.println("---------------------------------------------------");
                         for(int i = 0; i < allFlights.size(); i++) {
                             Flight flight = allFlights.get(i);
-                            System.out.println(String.format("%d. $%.0f | %s", i + 1, flight.getPrice(), flight.toString()));
+                            System.out.println(String.format("%d) $%.0f | %s", i + 1, flight.getPrice(), flight.toString()));
                         }
-                        System.out.println("-----------------------------------");
+                        System.out.println("0) Exit");
+                        System.out.println("---------------------------------------------------");
 
                         try {
-                            System.out.println("Which one would you like to buy?");
+                            System.out.println("Which one would you like?");
                             
                             Flight flight = allFlights.get(GetIntput() - 1);
 
                             if(flight.getPrice() <= traveler.getBalance()) {
-                                String preferredClass;
-                                String preferredSeat;
+                                FlightClass preferredClass;
+                                float totalExpenses = flight.getPrice();
+                                String seat = "";
 
-                                while(true) {
+                                for(String availableSeat : flight.getAirplane().passengersList.keySet())
+                                    if(flight.getAirplane().passengersList.get(availableSeat) == null) //free
+                                        seat = availableSeat;
 
-                                    System.out.println("Please pick a preferred seat. (1-10 + A-D)");
-
-                                    //for(String seat : flight.getAirplane().passengers.keySet())
-                                        //System.out.print(seat + " ");
-
-                                    preferredSeat = scanner.nextLine().toUpperCase();
-
-                                    if (flight.getAirplane().passengers.get(scanner.nextLine().toUpperCase()) == null)
+                                    if(seat.equals("")) {
+                                        System.out.println("Sorry, this flight is fully booked!");
                                         break;
-                                    else
-                                        System.out.println("This seat is taken!");
-                                }
+                                    }
+
 
                                 while(true) {
-                                    preferredClass = GetInput("Pick a preferred class. (business/first class)", "(business)|(first class)");
+                                    String classTextPrompt = String.format("Would you like to purchase first class for an extra $%.1f? (yes/no)\n", FlightClass.FIRST_CLASS.GetPrice());
+                                    preferredClass = GetInput(classTextPrompt, "(yes)|(no)").equals("yes") ? FlightClass.FIRST_CLASS : FlightClass.BUSINESS;
 
-                                    if(preferredClass.equals("first class") && traveler.getBalance() < (flight.getPrice() + 50))
+                                    if(preferredClass == FlightClass.FIRST_CLASS && traveler.getBalance() < (preferredClass.GetPrice() + flight.getPrice()))
                                         System.out.println("You can't afford this!");
-                                    else
+                                    else {
+                                        totalExpenses += FlightClass.FIRST_CLASS.GetPrice();
                                         break;
+                                    }
                                 }
 
-                                Boardingpass boardingpass = new Boardingpass(flight, preferredSeat, preferredClass);
+                                BoardingPass boardingpass = new BoardingPass(flight, seat, preferredClass);
 
-                                System.out.println(boardingpass.toString());
-                                
-                                String confirmation = GetInput("Please confirm purchase.", "(yes)|(no)");
+                                boolean confirmation = GetInput(String.format("%s\nTotal $%.2f, Please confirm purchase. (yes/no)\n", boardingpass.toString(), totalExpenses), "(yes)|(no)").equals("yes");
 
-                                if(confirmation.equals("yes")) {
-                                    flight.getAirplane().passengers.put(preferredSeat, traveler);
-                                    System.out.println("Boardingpass added to your inventory.");
-                                    float newBalance = traveler.getBalance() - flight.getPrice() + (preferredClass.equals("first class") ? 50 : 0);
-                                    traveler.setBalance(newBalance);
+                                if(confirmation) {
+                                    System.out.println("Ticket added to your inventory.");
+                                    traveler.setBalance(traveler.getBalance() - totalExpenses);
                                     traveler.getBoardingpass().add(boardingpass);
-                                }
+                                    flight.getAirplane().passengersList.put(seat, traveler);
+                                } else
+                                    continue;
 
                             } else {
-                                System.out.println(String.format("Not enough funds. ($%.2f", traveler.getBalance()));
+                                System.out.println(String.format("Not enough funds. ($%.2f)", traveler.getBalance()));
                             }
 
                             break;
-                        } catch (Exception e) {}
+                        } catch (Exception e) {
+                            //e.printStackTrace();
+                            break;
+                        }
 
                     }
                 }
