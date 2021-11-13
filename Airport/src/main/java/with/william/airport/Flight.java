@@ -23,13 +23,12 @@ public class Flight implements Comparable<Flight> {
         this.price = price;
         this.airplane = airplane;
 
-        System.out.println(departureTime.toString());
         this.flightNumber = String.format("%s%s", destination.getName().substring(0, 2).toUpperCase(), departureTime.toString().substring(11, 13));
     }
 
     @Override
     public String toString() {
-        return String.format("%s | %s |  %s   | %s", flightNumber, departureTime.format(Util.formatter), gate.toString(), destination.toString());
+        return String.format("%s | %s | %s", flightNumber, departureTime.format(Util.formatter), destination.toString());
     }
 
     @Override

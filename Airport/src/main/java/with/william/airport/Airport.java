@@ -44,7 +44,7 @@ public class Airport {
             if(terminalInfo.length() > 0) {
                 System.out.println(terminal.getName());
                 System.out.println("_______________________________________");
-                System.out.println("No.  | Time  | Gate | Destination");
+                System.out.println("No.  | Time  | Gate   | Destination");
                 System.out.println(terminalInfo);
             }
         }

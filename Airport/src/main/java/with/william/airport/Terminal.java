@@ -1,5 +1,7 @@
 package with.william.airport;
 
+import with.william.airport.util.Util;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,8 +38,14 @@ public class Terminal {
 
         Collections.sort(allFlights);
 
-        for(Flight flight : allFlights)
-            out += flight.toString() + "\n";
+        for(Flight flight : allFlights) {
+            out += String.format("%s | %s | %s | %s\n",
+                    flight.getFlightNumber(),
+                    flight.getDepartureTime().format(Util.formatter),
+                    flight.getGate().getName(),
+                    flight.getDestination().toString());
+        }
+            //out += flight.toString() + "\n";
 
 
         return out;

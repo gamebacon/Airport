@@ -2,12 +2,14 @@ import with.william.airport.Airport;
 import with.william.airport.Flight;
 import with.william.airport.Gate;
 import with.william.airport.Terminal;
+import with.william.airport.airplane.Airplane;
 import with.william.airport.airplane.PassengerPlane;
 import with.william.airport.human.Traveler;
 import with.william.airport.other.BoardingPass;
 import with.william.airport.other.FlightClass;
 import with.william.airport.util.Country;
 import with.william.airport.other.Passport;
+import with.william.airport.util.Util;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -17,19 +19,14 @@ public class Driver {
 
     private Scanner scanner = new Scanner(System.in);
 
-    private enum AirportAction {
+    private enum Action {
         NONE,
         EXIT,
         VIEW_MONITORS,
-        VIEW_BOARDINPASS,
+        VIEW_BOARDING_PASS,
         GO_TO_TERMINAL,
         GO_TO_GATE,
-        BUY_TICKET
-    }
-
-    private enum GateAction {
-        BOARD_PLANE,
-        WAIT,
+        BOARD_PLANE, BUY_TICKET
     }
 
     public static void main(String[] args) {
@@ -61,36 +58,41 @@ public class Driver {
         Flight flightToTegel2 = new Flight(tegel, LocalDateTime.parse("2021-11-20T22:04:30"), 1200, airplane);
         kastrup.scheduleFlight(2, 1, flightToTegel2);
 
-        //lets begin in kastrup.
         Airport currentAirport = kastrup;
+
         Terminal currentTerminal = currentAirport.getTerminals().get(0);
         Gate currentGate = null;
+        LocalDateTime currentTime = LocalDateTime.parse("2021-11-20T06:32:30");
 
         System.out.println("Who are you?");
 
-        Passport userPassport = new Passport("William With", Country.SWEDEN, "1998-10-16"); //CreatePassport();
+        Passport userPassport = CreatePassport();
         Traveler traveler = new Traveler(userPassport);
-        LocalDateTime time = LocalDateTime.now();
 
         clear();
+        System.out.println("Passport created!");
         System.out.println("You are now ready to explore the world!");
 
 
-        AirportAction action = AirportAction.NONE;
+        Action action = Action.NONE;
 
-        while(action != AirportAction.EXIT) {
-            System.out.println(
-                    String.format("\nCurrent location: %s%s - %s \nBalance: $%.2f\n", currentTerminal.getName(), currentGate != null ? String.format(", %s", currentGate.getName()) : "", currentAirport.toString(), traveler.getBalance()));
+        while(action != Action.EXIT) {
+
+            System.out.println("###################################################");
+            System.out.println(String.format("Location: %s%s - %s", currentTerminal.getName(), currentGate != null ? String.format(", %s", currentGate.getName()) : "", currentAirport.toString()));
+            System.out.println(String.format("Balance $%.2f", traveler.getBalance()));
+            System.out.println(String.format("Time %s", currentTime.format(Util.formatter)));
+            System.out.println("###################################################");
 
             //display all available actions.
-            for(int i = 1; i < AirportAction.values().length; i++)
-                System.out.print(String.format("%d(%s) \n", i, AirportAction.values()[i]));
+            for(int i = 1; i < Action.values().length; i++)
+                System.out.print(String.format("%d(%s) \n", i, Action.values()[i]));
 
             //take input
             try {
-                action = AirportAction.values()[Integer.parseInt(scanner.nextLine())];
+                action = Action.values()[Integer.parseInt(scanner.nextLine())];
                 clear();
-            } catch (Exception e) {}
+            } catch (Exception e) { action = Action.NONE; }
 
             System.out.println(action.toString());
             System.out.println("###################################################");
@@ -129,6 +131,7 @@ public class Driver {
 
                         try {
                             currentGate = currentTerminal.getGates().get(GetIntput() - 1);
+                            System.out.println(String.format("Transferring to %s..", currentGate.getName()));
                             break;
                         } catch (Exception e) {}
 
@@ -140,12 +143,61 @@ public class Driver {
                     currentAirport.ViewMonitors();
                 }
 
-                case VIEW_BOARDINPASS -> {
+                case VIEW_BOARDING_PASS -> {
                     if(traveler.getBoardingpass().size() == 0)
-                        System.out.println("No tickets purchased.");
+                        System.out.println("No boarding pass purchased.");
 
                     for(BoardingPass boardingpass : traveler.getBoardingpass())
                         System.out.println(boardingpass.toString());
+                }
+
+                case BOARD_PLANE -> {
+                    if(currentGate != null) {
+                        if(currentGate.getFlights().size() > 0) {
+                            Collections.sort(currentGate.getFlights());
+
+                            System.out.println("   | No.  | Time  |  Destination ");
+                            System.out.println("---------------------------------------------------");
+                            for(int i = 0; i < currentGate.getFlights().size(); i++) {
+                                Flight flight = currentGate.getFlights().get(i);
+                                System.out.println(String.format("%d) | %s", i + 1, flight.toString()));
+                            }
+
+                            System.out.println("0) Exit");
+                            System.out.println("---------------------------------------------------");
+
+                            try {
+                                System.out.println("Which one would you like to board?");
+
+                                Flight flight = currentGate.getFlights().get(GetIntput() - 1);
+                                boolean canBoard = false;
+
+                                for(BoardingPass boardingPass : traveler.getBoardingpass())
+                                    if(boardingPass.getFlight().equals(flight)) {
+                                        canBoard = true;
+                                    }
+
+                                if(canBoard) {
+                                    System.out.println("Boarding..");
+                                    Airplane airplane1 = flight.getAirplane();
+
+                                    airplane1.Fly();
+
+                                    currentAirport = flight.getDestination();
+                                } else {
+                                    System.out.println("You don't have a ticket for this flight!");
+                                }
+
+
+                            } catch (Exception e) {
+                                //e.printStackTrace();
+                            }
+                        } else {
+                            System.out.println("No flights departing from this gate.");
+                        }
+                    } else {
+                        System.out.println("Go to a gate first.");
+                    }
                 }
 
 
@@ -160,9 +212,8 @@ public class Driver {
 
                     Collections.sort(allFlights);
 
-
                     while(true) {
-                        System.out.println("   Price | No.  | Time  | Gate      | Destination ");
+                        System.out.println("   Price | No.  | Time  | Destination ");
                         System.out.println("---------------------------------------------------");
                         for(int i = 0; i < allFlights.size(); i++) {
                             Flight flight = allFlights.get(i);
@@ -227,6 +278,7 @@ public class Driver {
 
                     }
                 }
+
             }
 
 
