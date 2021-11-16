@@ -19,6 +19,14 @@ public class Traveler extends Human {
     }
 
 
+    //fick göra en rename från wait -> waiting då den var final i super class.
+    public void waiting() {
+        System.out.println("Taking a nap...");
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {};
+    }
+
     public Passport getPassport() {
         return passport;
     }

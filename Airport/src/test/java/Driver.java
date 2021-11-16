@@ -11,6 +11,7 @@ import with.william.airport.util.Country;
 import with.william.airport.other.Passport;
 import with.william.airport.util.Util;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -26,7 +27,17 @@ public class Driver {
         VIEW_BOARDING_PASS,
         GO_TO_TERMINAL,
         GO_TO_GATE,
-        BOARD_PLANE, BUY_TICKET
+        WAIT,
+        BOARD_PLANE,
+        BUY_TICKET;
+
+        @Override
+        public String toString() {
+            return super.toString().replace("_", " ");
+        }
+
+
+
     }
 
     public static void main(String[] args) {
@@ -66,7 +77,7 @@ public class Driver {
 
         System.out.println("Who are you?");
 
-        Passport userPassport = CreatePassport();
+        Passport userPassport = new Passport("William With", Country.SWEDEN, "1998-10-16");//createPassport();
         Traveler traveler = new Traveler(userPassport);
 
         clear();
@@ -83,6 +94,11 @@ public class Driver {
             System.out.println(String.format("Balance $%.2f", traveler.getBalance()));
             System.out.println(String.format("Time %s", currentTime.format(Util.formatter)));
             System.out.println("###################################################");
+
+            System.out.println(flightToArlanda.getDepartureTime().format(Util.formatter));
+            System.out.println(currentTime.format(Util.formatter));
+
+            Util.timeUntil(currentTime, flightToArlanda.getDepartureTime());
 
             //display all available actions.
             for(int i = 1; i < Action.values().length; i++)
@@ -151,6 +167,17 @@ public class Driver {
                         System.out.println(boardingpass.toString());
                 }
 
+                case WAIT -> {
+                    String in = GetInput(String.format("Current time: %s\nHow long would you like to wait? (HH:mm)\n", currentTime.format(Util.formatter)), "[0-9]{1}[0-9]{1}:[0-9]{1}[0-9]{1}");
+
+                    traveler.waiting();
+
+                    int hours = Integer.parseInt(in.split(":")[0]);
+                    int minutes = Integer.parseInt(in.split(":")[1]);
+                    currentTime = currentTime.plusHours(hours);
+                    currentTime = currentTime.plusMinutes(minutes);
+                }
+
                 case BOARD_PLANE -> {
                     if(currentGate != null) {
                         if(currentGate.getFlights().size() > 0) {
@@ -170,6 +197,14 @@ public class Driver {
                                 System.out.println("Which one would you like to board?");
 
                                 Flight flight = currentGate.getFlights().get(GetIntput() - 1);
+
+
+
+                                if(Duration.between(currentTime, flight.getDepartureTime()).toMinutes() > 10) {
+                                    System.out.println(String.format("This flight is not boarding until %s.", Util.timeUntil(currentTime, flight.getDepartureTime())));
+                                    break;
+                                }
+
                                 boolean canBoard = false;
 
                                 for(BoardingPass boardingPass : traveler.getBoardingpass())
@@ -330,11 +365,13 @@ public class Driver {
 
             Country country;
             while (true) {
+                    String countryS = "";
                 try {
-                    String countryS = GetInput("Country: ", "[A-Öa-ö]+");
+                    countryS = GetInput("Country: ", "[A-Öa-ö]+");
                     country = Country.valueOf(countryS.toUpperCase());
                     break;
                 } catch (Exception e) {
+                    System.out.println(String.format("The country \"%s\" was not found, try another.", countryS));
                 }
             }
 
