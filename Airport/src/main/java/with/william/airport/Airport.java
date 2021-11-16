@@ -1,6 +1,7 @@
 package with.william.airport;
 
 import with.william.airport.airplane.Airplane;
+import with.william.airport.human.Human;
 import with.william.airport.util.Country;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public class Airport {
 
     private List<Terminal> terminals = new ArrayList<>();
     private List<Airplane> airPlanes= new ArrayList<>();
+    private List<Human> humans = new ArrayList<>();
 
 
     public Airport(String name, Country country) {
@@ -67,5 +69,9 @@ public class Airport {
 
     public List<Terminal> getTerminals() {
         return terminals;
+    }
+
+    public List<Human> getPeople() {
+        return humans;
     }
 }

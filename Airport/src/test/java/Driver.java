@@ -4,14 +4,18 @@ import with.william.airport.Gate;
 import with.william.airport.Terminal;
 import with.william.airport.airplane.Airplane;
 import with.william.airport.airplane.PassengerPlane;
+import with.william.airport.human.Pilot;
+import with.william.airport.human.Staff;
 import with.william.airport.human.Traveler;
 import with.william.airport.other.BoardingPass;
 import with.william.airport.other.FlightClass;
+import with.william.airport.other.NoPilotException;
 import with.william.airport.util.Country;
 import with.william.airport.other.Passport;
 import with.william.airport.util.Util;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -52,7 +56,11 @@ public class Driver {
         Airport heathrow = new Airport("Heathrow", Country.ENGLAND);
         Airport kastrup = new Airport("Kastrup", Country.DENMARK);
 
+        Staff pilot1 = new Pilot("Oscar", Country.SWEDEN, LocalDate.parse("1993-10-14"));
+        kastrup.getPeople().add(pilot1);
+
         PassengerPlane airplane = new PassengerPlane();
+
 
         Flight flightToheathRow = new Flight(heathrow, LocalDateTime.parse("2021-11-20T10:23:30"), 1200, airplane);
         kastrup.scheduleFlight(0, 0, flightToheathRow);
@@ -69,16 +77,50 @@ public class Driver {
         Flight flightToTegel2 = new Flight(tegel, LocalDateTime.parse("2021-11-20T22:04:30"), 1200, airplane);
         kastrup.scheduleFlight(2, 1, flightToTegel2);
 
-        Airport currentAirport = kastrup;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        Airport currentAirport = kastrup;
         Terminal currentTerminal = currentAirport.getTerminals().get(0);
         Gate currentGate = null;
         LocalDateTime currentTime = LocalDateTime.parse("2021-11-20T06:32:30");
 
         System.out.println("Who are you?");
 
-        Passport userPassport = new Passport("William With", Country.SWEDEN, "1998-10-16");//createPassport();
-        Traveler traveler = new Traveler(userPassport);
+        Passport userPassport = createPassport();
+        Traveler traveler = new Traveler(userPassport.getFullName(), userPassport.getCountry(), userPassport.getDateOfBirth());
 
         clear();
         System.out.println("Passport created!");
@@ -89,18 +131,14 @@ public class Driver {
 
         while(action != Action.EXIT) {
 
+            //display info
             System.out.println("###################################################");
             System.out.println(String.format("Location: %s%s - %s", currentTerminal.getName(), currentGate != null ? String.format(", %s", currentGate.getName()) : "", currentAirport.toString()));
             System.out.println(String.format("Balance $%.2f", traveler.getBalance()));
             System.out.println(String.format("Time %s", currentTime.format(Util.formatter)));
             System.out.println("###################################################");
 
-            System.out.println(flightToArlanda.getDepartureTime().format(Util.formatter));
-            System.out.println(currentTime.format(Util.formatter));
-
-            Util.timeUntil(currentTime, flightToArlanda.getDepartureTime());
-
-            //display all available actions.
+            //display actions.
             for(int i = 1; i < Action.values().length; i++)
                 System.out.print(String.format("%d(%s) \n", i, Action.values()[i]));
 
@@ -181,51 +219,57 @@ public class Driver {
                 case BOARD_PLANE -> {
                     if(currentGate != null) {
                         if(currentGate.getFlights().size() > 0) {
-                            Collections.sort(currentGate.getFlights());
+                            while(true) {
+                                Collections.sort(currentGate.getFlights());
 
-                            System.out.println("   | No.  | Time  |  Destination ");
-                            System.out.println("---------------------------------------------------");
-                            for(int i = 0; i < currentGate.getFlights().size(); i++) {
-                                Flight flight = currentGate.getFlights().get(i);
-                                System.out.println(String.format("%d) | %s", i + 1, flight.toString()));
-                            }
-
-                            System.out.println("0) Exit");
-                            System.out.println("---------------------------------------------------");
-
-                            try {
-                                System.out.println("Which one would you like to board?");
-
-                                Flight flight = currentGate.getFlights().get(GetIntput() - 1);
-
-
-
-                                if(Duration.between(currentTime, flight.getDepartureTime()).toMinutes() > 10) {
-                                    System.out.println(String.format("This flight is not boarding until %s.", Util.timeUntil(currentTime, flight.getDepartureTime())));
-                                    break;
+                                System.out.println("   | No.  | Time  |  Destination ");
+                                System.out.println("---------------------------------------------------");
+                                for (int i = 0; i < currentGate.getFlights().size(); i++) {
+                                    Flight flight = currentGate.getFlights().get(i);
+                                    System.out.println(String.format("%d) | %s", i + 1, flight.toString()));
                                 }
 
-                                boolean canBoard = false;
+                                System.out.println("0) Exit");
+                                System.out.println("---------------------------------------------------");
 
-                                for(BoardingPass boardingPass : traveler.getBoardingpass())
-                                    if(boardingPass.getFlight().equals(flight)) {
-                                        canBoard = true;
+                                try {
+                                    System.out.println("Which one would you like to board?");
+
+                                    Flight flight = currentGate.getFlights().get(GetIntput() - 1);
+
+
+                                    boolean canBoard = false;
+
+                                    for (BoardingPass boardingPass : traveler.getBoardingpass())
+                                        if (boardingPass.getFlight().equals(flight)) {
+                                            canBoard = true;
+                                        }
+
+                                    if (canBoard) {
+                                        if (Duration.between(currentTime, flight.getDepartureTime()).toMinutes() > 10) {
+                                            System.out.println(String.format("This flight is not boarding until %s.", Util.timeUntil(currentTime, flight.getDepartureTime())));
+                                        } else {
+                                            System.out.println("Boarding..");
+                                            Airplane airplane1 = flight.getAirplane();
+
+                                            try {
+                                                airplane1.Fly();
+                                            } catch (NoPilotException e) {
+                                                System.out.println("Can't take of, pilot missing.");
+                                                break;
+                                            }
+
+                                            currentAirport = flight.getDestination();
+                                        }
+                                    } else {
+                                        System.out.println("You don't have a ticket for this flight!");
                                     }
 
-                                if(canBoard) {
-                                    System.out.println("Boarding..");
-                                    Airplane airplane1 = flight.getAirplane();
 
-                                    airplane1.Fly();
-
-                                    currentAirport = flight.getDestination();
-                                } else {
-                                    System.out.println("You don't have a ticket for this flight!");
+                                } catch (Exception e) {
+                                    //e.printStackTrace();
+                                    break;
                                 }
-
-
-                            } catch (Exception e) {
-                                //e.printStackTrace();
                             }
                         } else {
                             System.out.println("No flights departing from this gate.");
@@ -356,7 +400,7 @@ public class Driver {
             System.out.println();
     }
 
-    public Passport CreatePassport() {
+    public Passport createPassport() {
         Passport passport;
 
         while(true) {

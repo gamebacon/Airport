@@ -1,6 +1,7 @@
 package with.william.airport.airplane;
 
 import with.william.airport.human.Traveler;
+import with.william.airport.other.NoPilotException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,9 @@ public class PassengerPlane extends Airplane {
 
 
     @Override
-    public void Fly() {
+    public void Fly() throws NoPilotException {
+        super.Fly();
+
         System.out.println("Now taking of!");
     }
 }

@@ -1,11 +1,14 @@
 package with.william.airport.human;
 
 import with.william.airport.other.Passport;
+import with.william.airport.util.Country;
+
+import java.time.LocalDate;
 
 public class Security extends Staff {
 
-    public Security(Passport passport, float salary) {
-        super(passport, salary);
+    public Security(String name, Country country, LocalDate dateOfBirth) {
+        super(name, country, dateOfBirth, 3000);
     }
 
     @Override

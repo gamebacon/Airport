@@ -1,11 +1,15 @@
 package with.william.airport.human;
 
 import with.william.airport.other.Passport;
+import with.william.airport.util.Country;
+
+import java.time.LocalDate;
 
 public class Cleaner extends Staff {
 
-    protected Cleaner(Passport passport, float salary) {
-        super(passport, 50);
+
+    public Cleaner(String name, Country country, LocalDate dateOfBirth) {
+        super(name, country, dateOfBirth, 1500);
     }
 
     @Override

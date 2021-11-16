@@ -1,7 +1,6 @@
 package with.william.airport.human;
 
 import with.william.airport.util.Country;
-import with.william.airport.other.Passport;
 
 import java.time.LocalDate;
 
@@ -13,10 +12,10 @@ public abstract class Human {
 
     private String name;
 
-    protected Human(Passport id) {
-        this.name = id.getFullName();
-        this.country = id.getCountry();
-        this.dateOfBirth = id.getDateOfBirth();
+    protected Human(String fullName, Country country, LocalDate dateOfBirth) {
+        this.name = fullName;
+        this.country = country;
+        this.dateOfBirth = dateOfBirth;
 
     }
 
