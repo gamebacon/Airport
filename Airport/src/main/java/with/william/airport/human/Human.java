@@ -8,7 +8,7 @@ public abstract class Human {
 
     private LocalDate dateOfBirth; //added date of birth.
     private Country country; //added country
-    private float balance = 3000; // added money
+    private float balance = 800; // added money
 
     private String name;
 

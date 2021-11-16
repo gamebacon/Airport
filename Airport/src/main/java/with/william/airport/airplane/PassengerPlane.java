@@ -25,6 +25,8 @@ public class PassengerPlane extends Airplane {
     public void Fly() throws NoPilotException {
         super.Fly();
 
-        System.out.println("Now taking of!");
+        for (String seat : passengersList.keySet())
+            passengersList.put(seat, null);
+
     }
 }

@@ -10,10 +10,10 @@ public class Passport {
     private Country country; //encapsulated
     private LocalDate dateOfBirth; //added
 
-    public Passport(String fullName, Country country, String dateOfBirth) {
+    public Passport(String fullName, Country country, LocalDate dateOfBirth) {
         this.fullName = fullName;
         this.country = country;
-        this.dateOfBirth = LocalDate.parse(dateOfBirth);
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getFullName() {

@@ -3,7 +3,7 @@ package with.william.airport.other;
 //added flightclass
 public enum FlightClass {
     BUSINESS(0),
-    FIRST_CLASS(50);
+    FIRST_CLASS(30);
 
 
     private FlightClass(float price) {

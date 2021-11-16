@@ -1,6 +1,8 @@
 package with.william.airport.airplane;
 
+import with.william.airport.human.Human;
 import with.william.airport.human.Pilot;
+import with.william.airport.human.Traveler;
 import with.william.airport.other.NoPilotException;
 
 import java.util.ArrayList;
@@ -17,6 +19,12 @@ public abstract class Airplane {
             throw new NoPilotException("Can't fly without a pilot!");
 
         System.out.println("Taking of!");
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {}
+
+        System.out.println("Landed!");
     }
 
     public int getFuelLevel() {

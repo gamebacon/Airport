@@ -4,9 +4,7 @@ import with.william.airport.Gate;
 import with.william.airport.Terminal;
 import with.william.airport.airplane.Airplane;
 import with.william.airport.airplane.PassengerPlane;
-import with.william.airport.human.Pilot;
-import with.william.airport.human.Staff;
-import with.william.airport.human.Traveler;
+import with.william.airport.human.*;
 import with.william.airport.other.BoardingPass;
 import with.william.airport.other.FlightClass;
 import with.william.airport.other.NoPilotException;
@@ -17,6 +15,7 @@ import with.william.airport.util.Util;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 
@@ -52,50 +51,69 @@ public class Driver {
     public void go() {
 
         Airport tegel = new Airport("Tegel", Country.GERMANY);
-        Airport arlanda = new Airport("Arlanda", Country.SWEDEN);
-        Airport heathrow = new Airport("Heathrow", Country.ENGLAND);
-        Airport kastrup = new Airport("Kastrup", Country.DENMARK);
+        Cleaner cleaner5 = new Cleaner("Jason", Country.GERMANY, LocalDate.parse("1972-04-11"));
+        Security security5= new Security("Ann", Country.GERMANY, LocalDate.parse("1998-11-03"));
+        Pilot pilot4 = new Pilot("Hanson", Country.GERMANY, LocalDate.parse("1999-05-10"));
+        Pilot pilot5 = new Pilot("Albert", Country.GERMANY, LocalDate.parse("1991-10-14"));
+        tegel.getPeople().add(cleaner5);
+        tegel.getPeople().add(security5);
+        tegel.getPeople().add(pilot4);
+        tegel.getPeople().add(pilot5);
 
-        Staff pilot1 = new Pilot("Oscar", Country.SWEDEN, LocalDate.parse("1993-10-14"));
+        Airport arlanda = new Airport("Arlanda", Country.SWEDEN);
+        Cleaner cleaner3 = new Cleaner("Anton", Country.SWEDEN, LocalDate.parse("1972-02-12"));
+        Security security4 = new Security("Oscar", Country.SWEDEN, LocalDate.parse("1985-01-04"));
+        Pilot pilot = new Pilot("Jacob", Country.SWEDEN, LocalDate.parse("1999-05-10"));
+        Pilot pilot3 = new Pilot("Maria", Country.SWEDEN, LocalDate.parse("1991-10-14"));
+        arlanda.getPeople().add(cleaner3);
+        arlanda.getPeople().add(pilot);
+        arlanda.getPeople().add(security4);
+        arlanda.getPeople().add(pilot3);
+
+        Airport heathrow = new Airport("Heathrow", Country.ENGLAND);
+        Cleaner cleaner2 = new Cleaner("Mark", Country.ENGLAND, LocalDate.parse("1992-02-12"));
+        Security security2 = new Security("Daniel", Country.ENGLAND, LocalDate.parse("1982-05-10"));
+        Security security3 = new Security("Robert", Country.ENGLAND, LocalDate.parse("1995-01-04"));
+        Pilot pilot2 = new Pilot("Rebecka", Country.ENGLAND, LocalDate.parse("1993-10-14"));
+        heathrow.getPeople().add(cleaner2);
+        heathrow.getPeople().add(pilot2);
+        heathrow.getPeople().add(security2);
+
+
+        Airport kastrup = new Airport("Kastrup", Country.DENMARK);
+        Cleaner cleaner1 = new Cleaner("Anna", Country.DENMARK, LocalDate.parse("1992-02-12"));
+        Security security1 = new Security("Emil", Country.DENMARK, LocalDate.parse("1982-05-10"));
+        Pilot pilot1 = new Pilot("Oscar", Country.DENMARK, LocalDate.parse("1993-10-14"));
         kastrup.getPeople().add(pilot1);
+        kastrup.getPeople().add(cleaner1);
+        kastrup.getPeople().add(security2);
 
         PassengerPlane airplane = new PassengerPlane();
+        airplane.pilots.add(pilot1);
 
 
-        Flight flightToheathRow = new Flight(heathrow, LocalDateTime.parse("2021-11-20T10:23:30"), 1200, airplane);
-        kastrup.scheduleFlight(0, 0, flightToheathRow);
+        Flight kastrupToHeathrow = new Flight(heathrow, LocalDateTime.parse("2021-11-20T10:23:30"), 135, airplane);
+        kastrup.scheduleFlight(0, 0, kastrupToHeathrow);
 
-        Flight flightToTegel = new Flight(tegel, LocalDateTime.parse("2021-11-20T19:04:30"), 1200, airplane);
-        kastrup.scheduleFlight(0, 0, flightToTegel);
+        Flight kastrupToTegel = new Flight(tegel, LocalDateTime.parse("2021-11-20T19:04:30"), 120, airplane);
+        kastrup.scheduleFlight(0, 0, kastrupToTegel);
 
-        Flight flightToArlanda = new Flight(arlanda, LocalDateTime.parse("2021-11-20T23:04:30"), 1200, airplane);
-        kastrup.scheduleFlight(2, 2, flightToArlanda);
+        Flight kastrupToArlanda = new Flight(arlanda, LocalDateTime.parse("2021-11-20T23:04:30"), 140, airplane);
+        kastrup.scheduleFlight(2, 2, kastrupToArlanda);
 
-        Flight flightToHearthRow2 = new Flight(heathrow, LocalDateTime.parse("2021-11-20T23:59:30"), 1200, airplane);
-        kastrup.scheduleFlight(2, 0, flightToHearthRow2);
+        Flight kastrupToHeathrow2 = new Flight(heathrow, LocalDateTime.parse("2021-11-20T23:59:30"), 320, airplane);
+        kastrup.scheduleFlight(1, 0, kastrupToHeathrow2);
 
-        Flight flightToTegel2 = new Flight(tegel, LocalDateTime.parse("2021-11-20T22:04:30"), 1200, airplane);
-        kastrup.scheduleFlight(2, 1, flightToTegel2);
-
-
-
-
+        Flight kastrupToTegel2 = new Flight(tegel, LocalDateTime.parse("2021-11-20T22:04:30"), 320, airplane);
+        kastrup.scheduleFlight(2, 1, kastrupToTegel2);
 
 
 
+        Flight heathrowToTegel = new Flight(tegel, LocalDateTime.parse("2021-11-21T10:02:30"), 340, airplane);
+        heathrow.scheduleFlight(2, 2, heathrowToTegel);
 
-
-
-
-
-
-
-
-
-
-
-
-
+        Flight heathrowToKastrup = new Flight(kastrup, LocalDateTime.parse("2021-11-21T19:04:30"), 240, airplane);
+        heathrow.scheduleFlight(1, 2, heathrowToKastrup);
 
 
 
@@ -238,14 +256,15 @@ public class Driver {
                                     Flight flight = currentGate.getFlights().get(GetIntput() - 1);
 
 
-                                    boolean canBoard = false;
+
+                                    BoardingPass currentBoardingPass = null;
 
                                     for (BoardingPass boardingPass : traveler.getBoardingpass())
                                         if (boardingPass.getFlight().equals(flight)) {
-                                            canBoard = true;
+                                            currentBoardingPass = boardingPass;
                                         }
 
-                                    if (canBoard) {
+                                    if (currentBoardingPass != null) {
                                         if (Duration.between(currentTime, flight.getDepartureTime()).toMinutes() > 10) {
                                             System.out.println(String.format("This flight is not boarding until %s.", Util.timeUntil(currentTime, flight.getDepartureTime())));
                                         } else {
@@ -259,7 +278,14 @@ public class Driver {
                                                 break;
                                             }
 
+                                            traveler.getBoardingpass().remove(currentBoardingPass);
+                                            currentGate.getFlights().remove(flight);
+                                            currentGate = null;
+                                            currentTime = currentTime.plusHours(1);
                                             currentAirport = flight.getDestination();
+                                            currentTerminal = currentAirport.getTerminals().get(0);
+
+                                            break;
                                         }
                                     } else {
                                         System.out.println("You don't have a ticket for this flight!");
@@ -419,7 +445,14 @@ public class Driver {
                 }
             }
 
-            String dateOfBirth = GetInput("Date of birth (yyyy-MM-dd): ", "(\\d){4}[-](\\d){2}[-](\\d){2}");
+            LocalDate dateOfBirth;
+            while(true) {
+                String dateOfBirthStr = GetInput("Date of birth (yyyy-MM-dd): ", "(\\d){4}[-](\\d){2}[-](\\d){2}");
+                try {
+                    dateOfBirth = LocalDate.parse(dateOfBirthStr);
+                    break;
+                } catch (DateTimeParseException e) {}
+            }
 
             System.out.println("Now press \"Enter\" with your thump.");
             scanner.nextLine();
